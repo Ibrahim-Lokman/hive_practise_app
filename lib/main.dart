@@ -5,7 +5,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('hive_crud_box');
+  await Hive.openBox('activeCartItems');
   runApp(const MyApp());
 }
 
@@ -40,7 +40,7 @@ class _HomePageState extends State<HomePage> {
   PaymentOption? _paymentOption = PaymentOption.cash;
   List<Map<String, dynamic>> items = [];
   final activeCartItems = Hive.box('activeCartItems');
-  var activeShopData = Hive.box('activeShop');
+//  var activeShopData = Hive.box('activeShop');
 
   // bool _isLoading = true;
 
