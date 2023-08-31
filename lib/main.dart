@@ -39,12 +39,14 @@ class _HomePageState extends State<HomePage> {
   final TextEditingController _descController = TextEditingController();
   PaymentOption? _paymentOption = PaymentOption.cash;
   List<Map<String, dynamic>> items = [];
-  final hiveCrudBox = Hive.box('hive_crud_box');
+  final activeCartItems = Hive.box('activeCartItems');
+  var activeShopData = Hive.box('activeShop');
+
   // bool _isLoading = true;
 
   void _refreshItems() async {
-    final data = await hiveCrudBox.keys.map((key) {
-      final item = hiveCrudBox.get(key);
+    final data = await activeCartItems.keys.map((key) {
+      final item = activeCartItems.get(key);
       return {
         "id": key,
         "name": item["name"],
@@ -54,7 +56,7 @@ class _HomePageState extends State<HomePage> {
 
     setState(() {
       items = data.reversed.toList();
-      print("amount data is (hive) ${hiveCrudBox.length}");
+      print("amount data is (hive) ${activeCartItems.length}");
       print("amount data is (lcal) ${items.length}");
     });
   }
@@ -66,7 +68,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _addItem() async {
-    await hiveCrudBox.add({
+    await activeCartItems.add({
       "name": _nameController.text,
       "description": _descController.text,
     });
@@ -74,7 +76,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _updateItem(int id) async {
-    await hiveCrudBox.put(id, {
+    await activeCartItems.put(id, {
       "name": _nameController.text,
       "description": _descController.text,
     });
@@ -83,7 +85,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _deleteItem(int id) async {
-    await hiveCrudBox.delete(id);
+    await activeCartItems.delete(id);
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
       content: Text('successfully deleted!'),
     ));
@@ -204,7 +206,7 @@ class _HomePageState extends State<HomePage> {
                         "My Cart",
                         style: TextStyle(color: Colors.purple),
                       ),
-                      Text("Total  34 Items")
+                      Text("Total  ${items.length ?? '0'} Items")
                     ],
                   ),
                 ),
@@ -490,7 +492,7 @@ class _HomePageState extends State<HomePage> {
                     "Total Order",
                     style: TextStyle(fontFamily: "Inter-Bold"),
                   ),
-                  Text('20 Items'),
+                  Text('${items.length ?? '0'} Items'),
                   Text(
                     "TK 17800.00",
                     style: TextStyle(
