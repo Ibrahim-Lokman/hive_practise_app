@@ -1,152 +1,3 @@
-//  Box 1 'active_shopname' : "ibrahim Store",
-//  Box 2 'active_cart_items': { 
-//      'product_name_id_1': {name: 'abc', quantity: 10*, unitprice: 200, vat_percentage: 0.3, totalprice: ....,  },
-//      'product_name_id_2': {name: 'efg', quantity: 21*, unitprice: 350, vat_percentage: 0.4, totalprice: ....,  },
-//   }
-
-// 
-/
-
-// before showing prduct cards Check active_cart_list, if the product id exits in the list  
-//=> Show "Add" button, for selected item "Edit"
-// Add flow:
-    //=> pass product object with productid to "Add to cart page" 
-    //=> Add quantity in textfield
-    //=> Add unit type in dropdown
-    //=> click on "Add to cart button"
-    //=> onTap check sected quantity and in stock quantity
-    //=> Add selected product to active_cart_list
-// Edit Flow:
-    //=> pass product object with productid to "Add to cart page" 
-    //=> Show previously selected quantity from active_cart_list, Add quantity in textfield
-    //=> Show previously selected unit from active_cart_list, Add unit type in dropdown
-    //=> click on "Add to cart button"
-    //=> onTap check sected quantity and in stock quantity
-    //=> update selected product to active_cart_list
-// REMOVE
-    //=> pass product id to delete fuction
-    //=> delete from active_cart_list
-
-// place order, clear active_cart_list, Select payment type, Place order flow (Remaining)
-
-// if user move to another shop, and start adding product to cart
-// if different shopCode/Name exits in active_cart_list, show user a dialog for clearing the exiting cart
-
-
-
-
-
-// promo_code product wise or on all cart items.??
-// cart id related question
-// #Calculation 
-//  double total_before_VAT = unitPrice * unitQuantity;
-//  double vat_amount = totalBeforeVAT * vatPercentage;
-//  double total_price = totalBeforeVAT + vatAmount;
-
-
-
-shop
- {
-            "id": 1,
-            "name": "Verna Crist III",
-            "shop_name": "Hansen PLC",
-            "shop_address": "2999 Ransom Shores\nNew Bradside, AL 85195",
-            "image_url": "https://via.placeholder.com/640x480.png/004411?text=dolores",
-            "phone": "01182531501",
-            "tin": "657.452.9370",
-            "address": "3179 Quitzon Flats Suite 220\nBerniecechester, OK 26366-9931",
-            "division": "khulna",
-            "district": "Samsonmouth",
-            "thana": "Julius Branch",
-            "code": null,
-            "is_active": true,
-            "customer_group": "Retailer",
-            "latitude": 23.251638,
-            "longitude": 89.93667,
-            "created_at": "2023-08-21T11:50:54.000000Z",
-            "updated_at": "2023-08-21T11:50:54.000000Z"
-        },
-
-
-product:
-{
-            "id": 1,
-            "name": "Coke 1.25L",
-            "type": null,
-            "code": "35479106",
-            "image_url": "products/v82UqVh5PgSgqWOxJRBvAOfaxwB4VDCl3aFqenV1.jpg",
-            "category": {
-                "id": 2,
-                "name": "Grocery Items",
-                "image_url": null,
-                "created_at": "2023-08-30T05:52:07.000000Z",
-                "updated_at": "2023-08-30T05:52:07.000000Z"
-            },
-            "barcode_symbology": null,
-            "unit": {
-                "id": 1,
-                "unit_code": "pc",
-                "unit_name": "Piece",
-                "base_unit": null,
-                "operator": null,
-                "operation_value": null,
-                "is_active": true,
-                "created_at": "2023-08-30T06:21:02.000000Z",
-                "updated_at": "2023-08-30T06:21:02.000000Z"
-            },
-            "cost": 100,
-            "price": 120,
-            "qty": 25,
-            "alert_qty": null,
-            "promotion": 0,
-            "promotion_price": null,
-            "featured": null,
-            "is_active": null,
-            "created_at": "2023-08-30T06:22:13.000000Z",
-            "updated_at": "2023-08-30T06:24:28.000000Z"
-        },
-
-
-
-Step 1:
-
-shop_tracker_box:
-{
-    active_shop_code: _,
-    current_shop_code: _,
-}
-
-active_cart_list_box:
-{
-    "1" : {
-        "code": "product_name_code", (api)
-        "name": "product_name", (api)
-        "price": "price", (api)
-        "vat": "product_vat", (random)
-        "quantity": "product_quantity", (user_input)
-        "total_after_vat": "product_total_after_VAT", (calculated)
-        "total_before_VAT": "product_total_before_VAT", (calculated)
-        }
-}
-
-
-step 2:
-
-
-
-//
-
-
-
-
-
-
-
-
-
-
-//Old version of code
-
 import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -161,38 +12,72 @@ enum PaymentOption { cash, card }
 
 class _HomePageState extends State<HomePage> {
   final TextEditingController _nameController = TextEditingController();
-  final TextEditingController _descController = TextEditingController();
+  final TextEditingController _quantityController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
+  final TextEditingController _vatController = TextEditingController();
   PaymentOption? _paymentOption = PaymentOption.cash;
   List<Map<String, dynamic>> items = [];
   final activeCartItems = Hive.box('activeCartItems');
+  var totalCartPrice = 0.0;
 //  var activeShopData = Hive.box('activeShop');
 
   // bool _isLoading = true;
 
   Future<void> addItem() async {
-    await activeCartItems.add({
-      "name": _nameController.text,
-      "description": _descController.text,
-    });
+    int totalPriceBeforVat =
+        int.parse(_quantityController.text) * int.parse(_priceController.text);
+    print("Total price:  ${totalPriceBeforVat}");
+    double vat = totalPriceBeforVat * (int.parse(_vatController.text) / 100);
+    print("Vat:  ${vat}");
+    await activeCartItems.add(
+      {
+        "code": "product_name_code",
+        "name": _nameController.text,
+        "quantity": _quantityController.text,
+        "vat": _vatController.text,
+        "price": _priceController.text,
+        "total_before_vat": totalPriceBeforVat,
+        "total_after_vat": totalPriceBeforVat - vat,
+      },
+    );
     refreshItems();
   }
 
   Future<void> updateItem(int id) async {
+    int totalPriceBeforVat =
+        int.parse(_quantityController.text) * int.parse(_priceController.text);
+
+    double vat = totalPriceBeforVat * (int.parse(_vatController.text) / 100);
+
     await activeCartItems.put(id, {
+      "code": "product_name_old_code",
       "name": _nameController.text,
-      "description": _descController.text,
+      "quantity": _quantityController.text,
+      "vat": _vatController.text,
+      "price": _priceController.text,
+      "total_before_vat": totalPriceBeforVat,
+      "total_after_vat": totalPriceBeforVat - vat,
     });
     refreshItems();
     print("..number of items ${items.length}");
   }
 
   void refreshItems() async {
+    if (activeCartItems.keys.length == 0) totalCartPrice = 0.0;
+    totalCartPrice = 0.0;
     final data = await activeCartItems.keys.map((key) {
       final item = activeCartItems.get(key);
+      print("totalCartPrice : ${totalCartPrice}");
+      print("total_after_vat: ${item["total_after_vat"]}");
+      totalCartPrice = totalCartPrice + item["total_after_vat"];
       return {
         "id": key,
+        "code": "product_name_old_code",
         "name": item["name"],
-        "description": item["description"],
+        "quantity": item["quantity"],
+        "price": item["price"],
+        "vat": item['vat'],
+        "total_after_vat": item["total_after_vat"],
       };
     }).toList();
 
@@ -212,17 +97,33 @@ class _HomePageState extends State<HomePage> {
     print("..number of items ${items.length}");
   }
 
+  void clearController() {
+    _nameController.dispose();
+    _quantityController.dispose();
+    _priceController.dispose();
+    _vatController.dispose();
+  }
+
   void showForm(BuildContext ctx, int? itemKey) async {
     if (itemKey != null) {
       final existingJournal =
           items.firstWhere((element) => element['id'] == itemKey);
       _nameController.text = existingJournal['name'];
-      _descController.text = existingJournal['description'];
+      _quantityController.text = existingJournal['quantity'];
+      _priceController.text = existingJournal['price'];
+      _vatController.text = existingJournal['vat'];
     }
+
     showModal(itemKey);
   }
 
   Future<dynamic> showModal(int? itemKey) {
+    if (itemKey == null) {
+      _nameController.text = '';
+      _quantityController.text = '';
+      _priceController.text = '';
+      _vatController.text = '';
+    }
     return showModalBottomSheet(
         context: context,
         elevation: 5,
@@ -246,8 +147,22 @@ class _HomePageState extends State<HomePage> {
                     height: 20,
                   ),
                   TextField(
-                    controller: _descController,
+                    controller: _quantityController,
                     decoration: const InputDecoration(hintText: 'Quantity'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _priceController,
+                    decoration: const InputDecoration(hintText: 'Price'),
+                  ),
+                  const SizedBox(
+                    height: 20,
+                  ),
+                  TextField(
+                    controller: _vatController,
+                    decoration: const InputDecoration(hintText: 'Vat'),
                   ),
                   const SizedBox(
                     height: 20,
@@ -255,14 +170,14 @@ class _HomePageState extends State<HomePage> {
                   ElevatedButton(
                     onPressed: () async {
                       if (itemKey == null) {
+                        print("item key add:   ${itemKey}");
                         await addItem();
                       }
                       if (itemKey != null) {
+                        print("item key update:   ${itemKey}");
                         await updateItem(itemKey);
                       }
 
-                      _nameController.text = '';
-                      _descController.text = '';
                       Navigator.of(context).pop();
                     },
                     child: Text(itemKey == null ? 'Add Product' : 'Update'),
@@ -396,12 +311,12 @@ class _HomePageState extends State<HomePage> {
                                             child: Column(
                                               children: [
                                                 Text(
-                                                  "Tk dummy 500",
+                                                  "Tk: ${items[index]["total_after_vat"]}",
                                                   style: TextStyle(
                                                       color: Colors.purple),
                                                 ),
                                                 Text(
-                                                    "Qty: ${items[index]['description']}")
+                                                    "Qty: ${items[index]['quantity']}")
                                               ],
                                             ),
                                           )
@@ -473,7 +388,7 @@ class _HomePageState extends State<HomePage> {
                               style: TextStyle(fontFamily: "Inter-Bold"),
                             ),
                             Text(
-                              "Tk 2489.00",
+                              "Tk ${totalCartPrice}",
                               style: TextStyle(fontFamily: "Inter-Bold"),
                             ),
                           ],
@@ -485,11 +400,11 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "Offer",
+                              "Offer (15%)",
                               style: TextStyle(fontFamily: "Inter-Regular"),
                             ),
                             Text(
-                              "Tk 8900.00",
+                              "Tk ${totalCartPrice * 0.15 == 0 ? 0 : totalCartPrice * 0.15}",
                               style: TextStyle(fontFamily: "Inter-Regular"),
                             ),
                           ],
@@ -501,11 +416,11 @@ class _HomePageState extends State<HomePage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              "VAT (7%)",
+                              "VAT (0%)",
                               style: TextStyle(fontFamily: "Inter-Regular"),
                             ),
                             Text(
-                              "Tk 780.00",
+                              "Tk 0",
                               style: TextStyle(fontFamily: "Inter-Regular"),
                             ),
                           ],
@@ -623,7 +538,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   Text('${items.length ?? '0'} Items'),
                   Text(
-                    "TK 17800.00",
+                    "TK ${totalCartPrice - totalCartPrice * 0.15}",
                     style: TextStyle(
                         fontFamily: "Inter-Bold", color: Colors.green),
                   ),
@@ -660,4 +575,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-
