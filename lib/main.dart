@@ -117,14 +117,14 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   TextField(
                     controller: _nameController,
-                    decoration: const InputDecoration(hintText: 'Title'),
+                    decoration: const InputDecoration(hintText: 'Product Name'),
                   ),
                   const SizedBox(
                     height: 20,
                   ),
                   TextField(
                     controller: _descController,
-                    decoration: const InputDecoration(hintText: 'Description'),
+                    decoration: const InputDecoration(hintText: 'Quantity'),
                   ),
                   const SizedBox(
                     height: 20,
@@ -142,7 +142,7 @@ class _HomePageState extends State<HomePage> {
                       _descController.text = '';
                       Navigator.of(context).pop();
                     },
-                    child: Text(itemKey == null ? 'Create New' : 'Update'),
+                    child: Text(itemKey == null ? 'Add Product' : 'Update'),
                   )
                 ],
               ),
@@ -271,7 +271,8 @@ class _HomePageState extends State<HomePage> {
                                                   style: TextStyle(
                                                       color: Colors.purple),
                                                 ),
-                                                Text("Qty: Dummy")
+                                                Text(
+                                                    "Qty: ${items[index]['description']}")
                                               ],
                                             ),
                                           )
