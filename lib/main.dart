@@ -2,13 +2,12 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'cart_page.dart';
+import 'hive_to_do_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Hive.initFlutter();
-  await Hive.openBox('activeCartItems');
-  await Hive.openBox('activeShop');
+  await Hive.openBox('activeToDoItems');
   runApp(const MyApp());
 }
 
